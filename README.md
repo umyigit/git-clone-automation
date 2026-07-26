@@ -1,4 +1,4 @@
-# Repository Clone Script
+# Bash Script for Git Repository Management
 
 ## Usage
 
