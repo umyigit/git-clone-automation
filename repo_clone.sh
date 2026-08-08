@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+normalize_git_url() {
+	local url="$1"
+	
+	if [[ "$url" == git@github.com:* ]]; then
+		url="${url#git@github.com:}"
+	else
+		url="${url#https://github.com/}"
+		url="${url#http://github.com/}"
+	fi
+	
+	echo "$url"
+}
+
 if [ "$#" -ne 3 ]; then
 	echo "Usage: $0 <URL> <BRANCH_OR_TAG> <CLONE_PATH>"
 	exit 1
@@ -23,6 +36,21 @@ echo "Parent Dir    : $PARENT_DIR"
 echo
 
 if [ -d "$CLONE_PATH/.git" ]; then
+	CURRENT_URL=$(git -C "$CLONE_PATH" remote get-url origin)
+
+	EXPECTED_REPO=$(normalize_git_url "$URL")
+	CURRENT_REPO=$(normalize_git_url "$CURRENT_URL")
+
+	if [ "$EXPECTED_REPO" != "$CURRENT_REPO" ]; then
+		echo "Error: Different repositories."
+		echo "Expected: $EXPECTED_REPO"
+		echo "Found: $CURRENT_REPO"
+		exit 1
+	fi
+
+	echo "Expected Repo: $EXPECTED_REPO"
+	echo "Current Repo: $CURRENT_REPO"
+
 	echo "Repository is already cloned."
 	echo
 	
